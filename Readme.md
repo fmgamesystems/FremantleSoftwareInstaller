@@ -2,4 +2,7 @@
 
 ## Summary
 
-This repository contains a NSIS installer script and accompanying PowerShell scripts to install the Fremantle Software. It's designed to be a one-click installer that sets up all the necessary packages.
+This repository contains a NSIS installer script and additional PowerShell scripts to install the Fremantle Software and its dependencies.
+
+
+- An active Internet connection is required for this installer to fetch and install dependencies via Chocolatey.
