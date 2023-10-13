@@ -170,6 +170,11 @@ Section "MainSection" SEC01
 
   ; Execute Chocolatey install for the selected package and redirect output to the log file
   ExecWait 'cmd.exe /C choco install $SelectedPackage -y'
+  ;ExecWait 'powershell.exe -Command "Start-Process cmd.exe -ArgumentList `/C choco install $SelectedPackage -y` -Verb RunAs"'
+
+
+
+
 
   Sleep 3000
 
