@@ -7,6 +7,7 @@ RequestExecutionLevel admin ; Require admin rights
 !include "FileFunc.nsh"
 !insertmacro GetFileName
 !insertmacro GetParent
+!define VERSION "0.1.0"
 
 
 
@@ -35,7 +36,8 @@ RequestExecutionLevel admin ; Require admin rights
 
 ; Output and other settings
 Outfile "FremantleInstaller.exe"
-Caption "Fremantle Software Installer"
+Caption "Fremantle Software Installer v${VERSION}"
+VIProductVersion "${VERSION}"
 Icon "../fremantle.ico"
 Name "Fremantle Software Installer"
 BrandingText "Fremantle Game Systems Software"
