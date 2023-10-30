@@ -77,6 +77,8 @@ if ($env:BOXROOT) {
 
 $repoDir = Join-Path $boxRoot 'FM Game Systems\ChocoOfflineInstall\Common'
 $outDir = Join-Path $PSScriptRoot Internalize
+$tempDir = Join-Path $PSScriptRoot Temp
+
 #End of config
 
 function Get-LatestVersionNumber {
@@ -134,7 +136,14 @@ function Get-LatestPackage {
 }
 
 #Remove previous offline common packages and previously internalized packages
-Get-ChildItem -Path $repoDir -Exclude *.ps1 | Remove-Item –recurse -Force
+#Get-ChildItem -Path $repoDir -Exclude *.ps1 | Remove-Item –recurse -Force
+# Clear temp directory
+if (Test-Path $tempDir) {
+    Get-ChildItem -Path $tempDir | Remove-Item –recurse -Force
+} else {
+    New-Item -ItemType Directory -Force -Path $tempDir
+}
+
 $commonDirectory = Get-SourceDirectory $commonSource
 foreach ($package in $packages) 
 {
@@ -208,11 +217,28 @@ foreach ($package in $packages)
         }
     }
 }
+
+#Before deleting .nupkg files from $repoDir, check if $outDir has .nupkg files
+$outDirNupkgCount = (Get-ChildItem -Path $outDir -Filter *.nupkg).Count
+$repoDirNupkgCount = (Get-ChildItem -Path $repoDir -Filter *.nupkg).Count
+
+if ($outDirNupkgCount -gt 0 -and $repoDirNupkgCount -gt 0) {
+    #Move the nupkgs to temp
+    Get-ChildItem -Path $repoDir -Filter *.nupkg | ForEach-Object {
+        Move-Item $_.FullName -Destination $tempDir -Force
+    }
+    Write-Output "Old .nupkg files moved to $tempDir for backup."
+} else {
+    Write-Output "Not moving .nupkg files from $repoDir."
+}
+
+
 Get-ChildItem -Path $repoDir -Filter *.nupkg | Remove-Item –recurse -Force #Clear out old nupkgs
 #Now push every downloaded nupkg to offline common directory. This method makes sense, because there are many duplicated dependencies
 Get-ChildItem -Path $outDir -Filter *.nupkg | ForEach-Object { 
     Write-Output "Pushing $_.FullName to source $commonDirectory"
-    choco push $_.FullName --source $repoDir
+    #choco push $_.FullName --source $repoDir
+    Move-Item $_.FullName -Destination $tempDir
     $ChocoSuccess = $?
     if($ChocoSuccess)
     {
@@ -222,6 +248,22 @@ Get-ChildItem -Path $outDir -Filter *.nupkg | ForEach-Object {
         Write-Output ("Failed to push to source")
     }
 }
+
+# After moving all packages to temp directory, now move them to the repo directory.
+Get-ChildItem -Path $tempDir -Filter *.nupkg | ForEach-Object {
+    Move-Item $_.FullName -Destination $repoDir
+}
+
+#Remove-Item $tempDir -Recurse -Force
+# check if the packages are processed 
+$allProcessedSuccessfully = $packages | Where-Object { $_.Failed -eq 1 } | Measure-Object
+if (-not $allProcessedSuccessfully.Count) {
+    Remove-Item $tempDir -Recurse -Force
+    Write-Output "All packages processed successfully. Cleared the temp directory."
+} else {
+    Write-Output "Some packages failed to process. Check the $tempDir ."
+}
+
 
 $(foreach ($package in $packages) {
 	Write-Output "$($package.Name) $($package.Status)"

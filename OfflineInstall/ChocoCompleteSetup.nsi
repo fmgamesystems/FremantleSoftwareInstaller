@@ -7,7 +7,7 @@ RequestExecutionLevel admin ; Require admin rights
 !include "FileFunc.nsh"
 !insertmacro GetFileName
 !insertmacro GetParent
-!define VERSION "0.1.1"
+!define VERSION "0.1.2"
 
 ; Pages
 !define MUI_WELCOMEPAGE_TITLE "Fremantle Game Systems Software Installer"
@@ -56,7 +56,7 @@ Section "MainSection" SEC01
     Abort
   ${EndIf}
 
-  MessageBox MB_OK "Chocolatey install complete: now installing packages..."
+  MessageBox MB_OK "Chocolatey install complete: now preparing offline packages..."
 
   
   ExecWait 'powershell.exe -ExecutionPolicy Bypass -NoProfile -File "$TEMP\FremantleInstaller\PrepareOfflineInstall.ps1"'
