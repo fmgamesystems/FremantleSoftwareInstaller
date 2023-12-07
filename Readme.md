@@ -1,38 +1,46 @@
 # Fremantle Software Installer
 
-This repository contains the Fremantle Software Installer, a Windows installer using **NSIS**. It allows for both online and offline installations of Fremantle Software packages.
+This repository contains the Fremantle Software Installer, a Windows installer using **NSIS**. 
 
 ## Overview
 
-### Offline Installer
-Designed for situations where installation packages (.nupkg files) need to be locally available. This could be particularly beneficial in scenarios without internet access. This method allows users to select and install specific software versions from a .nupkg file.
-
-### Online Installer
-Provides an automated experience, fetching and installing the most up-to-date Fremantle Software packages directly. The installer uses **Chocolatey** to fetch and deploy the latest software from online repositories. It connects with Fremantle's Dropbox and Box folders, ensuring users receive the latest updates.
-
-## Features
-
-- **Custom Directory Selection**: Offers the choice to specify the desired installation directory.
-- **.Nupkg File Picker**: For offline installations, allowing users to select a specific .nupkg file.
-- **Seamless Online Installation**: Connects to Fremantle's Dropbox and Box repositories for the latest software packages.
-- **Automated Sync**: This process is enabled by the nupkg_list.txt file, which effectively maintains a real-time listing of all the latest available packages.
+The Fremantle Software Installer is optimized for situations where installation packages need to be locally available, such as in environments without internet access.
 
 
+## Setup and Build Process
 
-## Setup
+### Setting Up the Environment
 
-1. **Download the Installer**: Obtain the `FremantleSoftwareInstaller.exe` tailored for online/offline use.
-2. **Installation**: Launch the required installer as admin. 
-3. **Directory Selection**: After the welcome page, choose your desired installation directory.
-4. **Package Selection**:
-   - **Offline**: Utilize the "Browse" function to select the .nupkg file.
-   - **Online**: Let the installer fetch the latest Fremantle Software packages and select them.
-5. **Finalize Installation**: Follow on-screen installer to complete the process.
 
-### Offline Installations
+NSIS: Download the latest beta release of NSIS from [here](https://sourceforge.net/projects/nsis/).
 
-- **Preparation**: Acquire the desired .nupkg file(s). You can also use the sample .nupkg files found in the `packages` folder of this repo.
+Powershell: Download the latest release of Powershell from [here](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4).
 
-### Online Installations
+Before building the installer, set up the environment by specifying the path to the `makensis.exe` file required by NSIS.
 
-- **Chocolatey Requirement**: Ensure Chocolatey is pre-installed and configured on your system with access
+#### SetNSISPath.ps1 Script
+
+- **Purpose**: Sets the `MAKENSIS_PATH` environment variable to the path of the `makensis.exe` file.
+- **Setup**: Run `SetNSISPath.ps1` in PowerShell with administrative privileges. It defaults to a preset NSIS directory. This script only needs to be run once unless the location of `makensis.exe` changes.
+
+### Building the Installer
+
+After setting up the environment, use the `BuildInstaller.ps1` to compile the NSIS script into the installer.
+
+#### BuildInstaller.ps1 Script
+
+- **Purpose**: Completes the building of NSIS installers from the provided `.nsi` script.
+- **Prerequisites**: The `MAKENSIS_PATH` environment variable should be set correctly. You can check and confirm the path by opening up a command line window and providing the command `echo %MAKENSIS_PATH` which will provide the current path for NSIS.  
+- **Usage**: Run `BuildInstaller.ps1` from the same directory where the `.nsi` script is located to build the installer for different configurations.
+
+
+
+## Installation Process
+
+1. **Download the Installer**: After building, locate the `FremantleSoftwareInstaller.exe`.
+
+2. **Launch**: Run the installer as admin.
+
+3. **Finalize Installation**: Follow the on-screen instructions to complete the installation.
+
+

@@ -7,7 +7,7 @@ RequestExecutionLevel admin ; Require admin rights
 !include "FileFunc.nsh"
 !insertmacro GetFileName
 !insertmacro GetParent
-!define VERSION "0.1.3"
+!define VERSION "0.1.4"
 
 
 ; Pages
@@ -45,6 +45,13 @@ Function DestroyInstFilesDialog
     ${EndIf}
 FunctionEnd
 
+Function IncludePackages
+  ; include all the nupkg packages
+  File /nonfatal /r "Common\*.nupkg"
+
+FunctionEnd
+
+
 
 !insertmacro MUI_LANGUAGE "English"
 
@@ -78,8 +85,9 @@ Section "MainSection" SEC01
   SendMessage $2 ${PBM_SETPOS} 30 0;
 
   ; Include all .nupkg files
-  File /nonfatal /r "Common\*.nupkg"
-  SendMessage $2 ${PBM_SETPOS} 40 0; 
+
+
+  Call IncludePackages
 
   ; PowerShell script for Chocolatey installation
   ExecWait 'powershell.exe -ExecutionPolicy Bypass -NoProfile -File "$TEMP\FremantleInstaller\install.ps1"'
